@@ -8,7 +8,7 @@ import com.cjhm.member.entity.User;
 import com.cjhm.member.repository.MemberRepository;
 
 @Service
-public class MemberService {
+public class MemberService { 
 
 	MemberRepository memberRepository;
 
@@ -22,7 +22,7 @@ public class MemberService {
 
 		logger.info("login info : " + email + " : " + password);
 		User u = memberRepository.findByEmail(email);
-		logger.info("user info : " + u);
+		logger.info("create user : " + u);
 		String encriptPassword = encript(password);
 		if (u != null && u.getPassword().equals(encriptPassword)) {
 			return u;
@@ -30,22 +30,8 @@ public class MemberService {
 		return null;
 	}
 
-	public User findUserByEmail(String email) {
-		logger.info("login info : " + email);
-		User u = memberRepository.findByEmail(email);
-		logger.info("user info : " + u);
-
-		return u;
-
-	}
-
 	private String encript(String password) {
 		return password;
-	}
-
-	public User saveUser(User u) {
-		
-		return memberRepository.save(u);
 	}
 
 }
