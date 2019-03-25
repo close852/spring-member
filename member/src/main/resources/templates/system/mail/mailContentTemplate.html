@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!------ Include the above in your HEAD tag ---------->
+<body>
+	<br>
+	<table  style="border-collapse: collapse; border-spacing: 0px; width: 315px; left: 5px; top: 6px;">
+		<tbody>
+			<tr>
+				<th colspan="2" style="font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; background-color: rgb(255, 204, 103); text-align: center; height: 25px; width: 313px;" th:text="${title}"></th>
+			</tr>
+			<tr>
+				<td style="padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: break-all; border-color: inherit; background-color: rgb(255, 254, 101); text-align: center; height: 25px; width: 50%;">이메일</td>
+				<td style="padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: break-all; border-color: inherit; background-color: rgb(255, 254, 101); text-align: center; height: 25px; width: 50%;" th:text="${email}"></td>
+			</tr>
+			<tr>
+				<td style="padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: break-all; border-color: inherit; background-color: rgb(255, 254, 101); text-align: center; height: 25px; width: 50%;">인증번호</td>
+				<td style="padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: break-all; border-color: inherit; background-color: rgb(255, 254, 101); text-align: center; height: 25px; width: 50%;" th:text="${authNumber}"></td>
+			</tr>
+			<tr>
+				<td> 감사합니다.</td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+</html>

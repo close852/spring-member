@@ -69,6 +69,11 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 
+		<!-- 메일발송을 위한 의존성 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
