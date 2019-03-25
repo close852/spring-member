@@ -36,16 +36,16 @@ public class MemberApplication {
 		SpringApplication.run(MemberApplication.class, args);
 	}
 
-	@Bean
-	public CommandLineRunner init() {
-		System.out.println("init!!");
-		return (args) -> {
-			User user = new User();
-			user.setEmail("close852@naver.com");
-			user.setPassword("1234");
-			user.setName("jiwoo");
-			memberRepository.save(user);
-		};
-	}
+//	@Bean
+//	public CommandLineRunner init() {
+//		System.out.println("init!!");
+//		return (args) -> {
+//			User user = new User();
+//			user.setEmail("close852@naver.com");
+//			user.setPassword("1234");
+//			user.setName("jiwoo");
+//			memberRepository.save(user);
+//		};
+//	}
 
 }

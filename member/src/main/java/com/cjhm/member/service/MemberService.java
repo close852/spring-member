@@ -38,6 +38,10 @@ public class MemberService {
 		return u;
 
 	}
+	
+	public User updateUserByEmail(User u) {
+		return memberRepository.save(u);
+	}
 
 	private String encript(String password) {
 		return password;
