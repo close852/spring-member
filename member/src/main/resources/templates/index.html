@@ -67,12 +67,17 @@ hr {
 	padding: 0px;
 	border: 1px solid #F0F0F0;
 }
+#footerTitle ul >li {
+	text-align: center;
+    font-size: 11px;
+	display: inline;
+}
 </style>
 </head>
 <body>
 	<div class="container">
 		<header th:replace="layout/header :: header"></header>
-		<div class="container" style="width: 980px; margin: 0 auto;">
+		<div class="container" style="width: 980px; height:800px; margin: 0 auto;">
 			여기가본문
 		</div>
 		<footer th:replace="layout/footer :: footer"></footer>

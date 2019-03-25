@@ -10,13 +10,22 @@
 <link rel="stylesheet" href="/css/member/join/join.css">
 
 <script type="text/javascript">
+
+	
 $(document).ready(function(){
 	$("#joinForm").submit((e)=>{
+		let username = $("#username");
 		let pass = $("#password");
 		let pass2 = $("#password2");
 		let email = $("#email").val();
+		
+		if(email =='' || pass.val() == '' ||  pass2.val() == '' || username.val()==''){
+			$("#error").show();
+			e.preventDefault();
+			return;
+		}
 		if(pass.val()!=pass2.val()){
-			$("#error").show().html("패스워드 확인 요청");
+			$("#passwordValid").show();
 			pass.val('').focus();
 			pass2.val('');
 			e.preventDefault();
@@ -38,13 +47,39 @@ $(document).ready(function(){
 		});
 
 	});
+	$("#email").keyup((e)=>{
+		var emailVal = e.target.value;
+		console.log(e.target.value);
+		var regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+		// 검증에 사용할 정규식 변수 regExp에 저장
+		if (emailVal.match(regExp) != null) {
+			$("#emailValid").hide();
+		}else{
+			$("#emailValid").show();
+			e.preventDefault();
+			return;
+		}
+// 		alert('asd');
+		$.ajax({
+			  url: "/apis/member/findUserByIdAjax",
+			  method: "POST",
+			  async : false,
+			  data: { email: emailVal}
+		})
+		.done(function( user ) {
+			if(user){
+				$("#emailValid").show();
+			}
+		});
+		
+	});
 	
 	$("#password2").keyup((e)=>{
 		let pass = $("#password").val();
 		let value = e.target.value;
-		$("#error").show().html("패스워드 확인 요청");
+		$("#passwordValid").show();
 		if(pass === value){
-			$("#error").hide();
+			$("#passwordValid").hide();
 		}
 	});
 });
@@ -53,10 +88,17 @@ $(document).ready(function(){
 <body>
 <br>
 	<!--container start.//-->
-	<div class="container" style="max-width: 400px;">
+	<div class="container" style="max-width: 500px;">
+			<div id="error" class="alert alert-danger" role="alert" style="display: none;">
+				There were problems creating your account.
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+	
 		<!-- card.// -->
 		<div class="card bg-light">
-			<article class="card-body mx-auto" style="max-width: 400px;">
+			<article class="card-body mx-auto" style="max-width: 500px;">
 				<h4 class="card-title mt-3 text-center">Create Account</h4>
 				<p class="text-center">Get started with your free account</p>
 				<form id="joinForm" action="/member/join" method="post">
@@ -65,7 +107,7 @@ $(document).ready(function(){
 							<span class="input-group-text"> <i class="fa fa-user"></i>
 							</span>
 						</div>
-						<input name="username" class="form-control" placeholder="username" type="text" required="required">
+						<input id="username" name="username" class="form-control" placeholder="username" type="text">
 					</div>
 					<!-- form-group// -->
 					<div class="form-group input-group">
@@ -73,7 +115,10 @@ $(document).ready(function(){
 							<span class="input-group-text"> <i class="fa fa-envelope"></i>
 							</span>
 						</div>
-						<input name="email" id="email" class="form-control" placeholder="Email address" type="email" required="required">
+						<input name="email" id="email" class="form-control" placeholder="Email address" type="input">
+					</div>
+					<div id="emailValid" class="form-group" style="display: none; color: red;">
+						Email is invalid or already taken
 					</div>
 					<!-- form-group// -->
 					<div class="form-group input-group">
@@ -81,7 +126,7 @@ $(document).ready(function(){
 							<span class="input-group-text"> <i class="fa fa-lock"></i>
 							</span>
 						</div>
-						<input name="password" id="password" class="form-control" placeholder="Create password" type="password" required="required">
+						<input name="password" id="password" class="form-control" placeholder="Create password" type="password">
 					</div>
 					<!-- form-group// -->
 					<div class="form-group input-group">
@@ -89,12 +134,12 @@ $(document).ready(function(){
 							<span class="input-group-text"> <i class="fa fa-lock"></i>
 							</span>
 						</div>
-						<input name="password2" id="password2" class="form-control" placeholder="Repeat password" type="password" required="required">
+						<input name="password2" id="password2" class="form-control" placeholder="Repeat password" type="password">
 					</div>
 					<div class="form-group">
-						<div id="error" class="alert alert-danger" role="alert" style="display: none;">
-						  This is a danger alert—check it out!
-						</div>
+					<div id="passwordValid" class="form-group" style="display: none; color: red;">
+						The password is incorrect.
+					</div>
 					</div>
 					<div>
 					</div>

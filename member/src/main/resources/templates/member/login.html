@@ -15,10 +15,18 @@
 	<!--container start.//-->
 	<div class="container" style="max-width: 400px;">
 		<!-- card.// -->
-		<div class="card bg-light">
 
+			<div id="error" class="alert alert-danger" role="alert" th:if="${error}">
+				<span th:text="${error}"></span>
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		<div class="card bg-light">
 			<article class="card-body mx-auto" style="max-width: 400px;">
-				<h4 class="card-title mt-3 text-center"><a href="/">Sign In</a></h4>
+				<h4 class="card-title mt-3 text-center">
+					<a href="/">Sign In</a>
+				</h4>
 				<form id="loginForm" action="/member/login" method="post">
 					<!-- form-group// -->
 					<div class="form-group input-group">
@@ -26,8 +34,7 @@
 							<span class="input-group-text"> <i class="fa fa-envelope"></i>
 							</span>
 						</div>
-						<input name="email" id="email" class="form-control"
-							placeholder="Email address" type="email" required="required">
+						<input name="email" id="email" class="form-control" placeholder="Email address" type="input" th:value="${email}">
 					</div>
 					<!-- form-group// -->
 					<div class="form-group input-group">
@@ -36,15 +43,8 @@
 							</span>
 						</div>
 						<input name="password" id="password" class="form-control"
-							placeholder="Password" type="password" required="required">
+							placeholder="Password" type="password">
 					</div>
-					<!-- form-group// -->
-					<div class="form-group">
-						<div id="error" class="alert alert-danger" role="alert" style="display: none;">
-							This is a danger alert—check it out!
-						</div>
-					</div>
-					<div></div>
 					<!-- form-group// -->
 					<div class="form-group">
 						<button type="submit" class="btn btn-primary btn-block">

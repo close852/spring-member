@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.thymeleaf.util.StringUtils;
 
 import com.cjhm.member.constants.MemberConstants;
 import com.cjhm.member.entity.User;
@@ -63,6 +63,7 @@ public class MemberController {
 		// error 메시지 전달
 		if (u == null) {
 			model.addAttribute("error", "Incorrect email or password.");
+			model.addAttribute("email", email);
 			return "/member/login";
 		}
 		return "redirect:/";
@@ -74,21 +75,17 @@ public class MemberController {
 	}
 
 	@PostMapping("/join")
-	public String postJoin(@RequestParam("username") String name, @RequestParam("password") String password,
-			@RequestParam("email") String email) {
+	public String postJoin(@RequestParam("username") String name, @RequestParam("password") String password, @RequestParam("email") String email) {
+		
 		User u = new User();
 		u.setName(name);
 		u.setEmail(email);
 		u.setPassword(password);
-
+		
 		logger.error("user data : " + u);
 		u = memberService.saveUser(u);
 		logger.error("user save data : " + u);
-		if (u != null) {
-			return "redirect:/";
-		} else {
-			return "redirect:/member/join";
-		}
+		return "redirect:/";
 	}
 
 	@GetMapping("/password_reset")

@@ -1,14 +1,26 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<!--header-->
-		<div th:fragment="footer">
-			<hr>
-			<section id="footerTitle">
-				<div style="background-color: skyblue; height: 110px; ">
-				<div style="margin: 0 auto; width: 980px;">여기가 Footer</div>
+<!--footer-->
+<div th:fragment="footer">
+	<hr>
+	<section id="footerTitle">
+		<div style="height: 110px;">
+			<div style="margin: 0 auto; width: 980px; text-align: center;">
+				<article>
+					<ul>
+						<li>이용약관</li>
+						<li>개인정보처리방침</li>
+						<li>책임의 한계와 법적고지</li>
+						<li>화원정보</li>
+						<li>고객센터</li>
+					</ul>
+				</article>
+				<div style="font-size: 10px; text-align: center;">
+					퍼즐몰 Copyright © PuzzleMall Corp. All Rights Reserved.
 				</div>
-			</section>
-			<article class="bottom-bar">
-			</article>
+			</div>
 		</div>
-<!--/header-->
+	</section>
+	<article class="bottom-bar"></article>
+</div>
+<!--/footer-->
 </html>
