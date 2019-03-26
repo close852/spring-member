@@ -2,13 +2,80 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
 <title>퍼즐몰</title>
-	<link rel="stylesheet" href="/css/index.css">
+<!-- CSS -->
+<link rel="stylesheet" href="/css/index.css">
+<link rel="stylesheet" href="/css/main/animate.min.css">
+<link rel="stylesheet" href="/css/main/jquery.desoslide.min.css">
+<link rel="stylesheet" href="/webjars/bootstrap/4.1.3/css/bootstrap.min.css" />
+
+<link rel="stylesheet" href="/css/main/animate.min.css">
+<!-- <link rel="stylesheet" href="/css/main/magic.min.css"> -->
+<!-- JavaScript -->
+<script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+<script src="/js/main/jquery.desoslide.min.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#slideshow').desoSlide({
+		    thumbs: $('#slideshow_thumbs li > a'),
+		    auto: {
+		        start: true
+		    },
+		    overlay: 'none'
+		});
+
+	})
+</script>
 </head>
 <body>
+<!-- https://sylouuu.github.io/desoslide/ -->
 	<div class="container">
 		<header th:replace="layout/header :: header"></header>
-		<div class="container" style="width: 980px; min-height:700px; margin: 0 auto;">
-			여기가본문
+           <div class="row">
+           <article class="col-lg-2 col-md-2">
+           <div id="" >
+			<ul id="slideshow_thumbs" class="slideshow_thumbs desoslide-thumbs-vertical list-inline text-center" style="list-style-type: none; z-index: 3;" > 
+				<li>
+					<a href="/img/main/bick_buck_bunny.jpg" data-desoslide-index="4">
+						<img src="/img/main/bick_buck_bunny_thumb.jpg" alt="Image">
+					</a>
+				</li>
+				<li>
+					<a href="/img/main/bick_buck_bunny.jpg" data-desoslide-index="4"> 
+						<img src="/img/main/bick_buck_bunny_thumb.jpg" alt="Image">
+					</a>
+				</li>
+				<li>
+					<a href="/img/main/bick_buck_bunny.jpg" data-desoslide-index="4"> 
+						<img src="/img/main/bick_buck_bunny_thumb.jpg" alt="Image"
+							data-desoslide-caption-title="Hi i'm an image"
+							data-desoslide-caption-link="http://my-website.com">
+					</a>
+				</li>
+			</ul>
+           </div>
+			<div id="slideshow" class="col-lg-6 col-md-6" style="">
+				<div class="desoslide-wrapper">
+					<img alt="Bick Buck Bunny"
+						class="img-responsive animated fadeInLeft"
+						src="/img/main/bick_buck_bunny.jpg">
+					<div class="desoslide-overlay"
+						style="left: 0px; top: 313px; width: 617px; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; opacity: 0.7;">
+						<span class="desoslide-caption-title">Bick Buck Bunny</span>
+						<div class="desoslide-controls-wrapper">
+							<a class="desoslide-controls prev" href="#prev"></a> <a
+								class="desoslide-controls pause" href="#pause"
+								style="display: none;"></a> <a class="desoslide-controls play"
+								href="#play"></a> <a class="desoslide-controls next" href="#next"></a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</article>
+		</div>
+<!-- 		<div class="container" style="width: 980px; min-height: 700px; margin: 0 auto;">여기가본문 -->
+		<div class="container" style="width: 980px; margin: 0 auto;">여기가본문
 		</div>
 		<footer th:replace="layout/footer :: footer"></footer>
 	</div>
