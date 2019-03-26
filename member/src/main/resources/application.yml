@@ -10,4 +10,4 @@ spring:
       ddl-auto: update
   devtools: 
     livereload:
-      enabled: true  mail:    host: smtp.gmail.com    port: 587    username: close852@gmail.com    password: gozldgkwlakfk    protocol: smtp    smtp:      start-tls-enable: true      auth: true    
+      enabled: true  mail:    host: smtp.gmail.com    port: 587    username:     password:     protocol: smtp    smtp:      start-tls-enable: true      auth: true    
