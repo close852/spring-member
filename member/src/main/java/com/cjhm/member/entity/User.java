@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -29,15 +28,12 @@ public class User implements Serializable {
 	private long idx;
 
 	@Column
-	@NotNull
 	private String name;
 
 	@Column
-	@NotNull
 	private String password;
 
 	@Column
-	@NotNull
 	private String email;
 
 	@Column

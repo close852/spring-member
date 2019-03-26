@@ -1,13 +1,1 @@
-server:  port: 80
-spring:
-  datasource:
-    url: jdbc:mariadb://localhost:3306/testdb
-    username: root
-    password: root
-    driver-class-name: org.mariadb.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-  devtools: 
-    livereload:
-      enabled: true        
+server:  port: 8088spring:  datasource:    url: jdbc:mariadb://localhost:3306/testdb    username: root    password: 1234    driver-class-name: org.mariadb.jdbc.Driver  jpa:    hibernate:      ddl-auto: update  devtools:     livereload:      enabled: true  mail:    host: smtp.gmail.com    port: 587    username: close852@gmail.com    password: gozldgkwlakfk    protocol: smtp    smtp:      start-tls-enable: true      auth: true    

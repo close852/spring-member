@@ -2,103 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
 <title>Login Page</title>
-<!--Fontawesome CDN-->
-<link rel="stylesheet" href="/webjars/bootstrap/4.1.3/css/bootstrap.min.css" />
-<script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
-<script src="/webjars/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="/css/member/common/all.css">
-<link rel="stylesheet" href="/css/member/join/join.css">
-
-<script type="text/javascript">
-
+	<!-- CSS -->
+	<link rel="stylesheet" href="/webjars/bootstrap/4.1.3/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="/css/member/common/all.css">
+	<link rel="stylesheet" href="/css/member/common/common.css">
 	
-$(document).ready(function(){
-	$("#joinForm").submit((e)=>{
-		let username = $("#username");
-		let pass = $("#password");
-		let pass2 = $("#password2");
-		let email = $("#email").val();
-		
-		if(email =='' || pass.val() == '' ||  pass2.val() == '' || username.val()==''){
-			$("#error").show();
-			e.preventDefault();
-			return;
-		}
-		if(pass.val()!=pass2.val()){
-			$("#passwordValid").show();
-			pass.val('').focus();
-			pass2.val('');
-			e.preventDefault();
-		}
-		//중복계정 체크하는 로직
-		$.ajax({
-			  url: "/apis/member/findUserByIdAjax",
-			  method: "POST",
-			  async : false,
-			  data: { email: email}
-		})
-		.done(function( user ) {
-			if(user){
-				$("#error").show().html("이미 존재하는 계정입니다.");
-				pass.val('');
-				pass2.val('');
-				e.preventDefault();
-			}
-		});
-
-	});
-	$("#email").keyup((e)=>{
-		var emailVal = e.target.value;
-		console.log(e.target.value);
-		var regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
-		// 검증에 사용할 정규식 변수 regExp에 저장
-		if (emailVal.match(regExp) != null) {
-			$("#emailValid").hide();
-		}else{
-			$("#emailValid").show();
-			e.preventDefault();
-			return;
-		}
-// 		alert('asd');
-		$.ajax({
-			  url: "/apis/member/findUserByIdAjax",
-			  method: "POST",
-			  async : false,
-			  data: { email: emailVal}
-		})
-		.done(function( user ) {
-			if(user){
-				$("#emailValid").show();
-			}
-		});
-		
-	});
-	
-	$("#password2").keyup((e)=>{
-		let pass = $("#password").val();
-		let value = e.target.value;
-		$("#passwordValid").show();
-		if(pass === value){
-			$("#passwordValid").hide();
-		}
-	});
-});
-</script>
+	<!-- JavaScript -->
+	<script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+	<script src="/webjars/jquery-validation/1.17.0-1/jquery.validate.min.js"></script>
+	<script src="/webjars/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+	<script src="/js/member/join.js"></script>
 </head>
 <body>
 <br>
 	<!--container start.//-->
 	<div class="container" style="max-width: 500px;">
-			<div id="error" class="alert alert-danger" role="alert" style="display: none;">
-				There were problems creating your account.
+			<div id="error" class="alert alert-danger" role="alert" th:if="${error}">
+				<span th:text="${error}"></span>
 				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-	
 		<!-- card.// -->
 		<div class="card bg-light">
-			<article class="card-body mx-auto" style="max-width: 500px;">
+			<article class="card-body mx-auto w-75" >
 				<h4 class="card-title mt-3 text-center">Create Account</h4>
 				<p class="text-center">Get started with your free account</p>
 				<form id="joinForm" action="/member/join" method="post">
@@ -115,7 +42,7 @@ $(document).ready(function(){
 							<span class="input-group-text"> <i class="fa fa-envelope"></i>
 							</span>
 						</div>
-						<input name="email" id="email" class="form-control" placeholder="Email address" type="input">
+						<input name="email" id="email" class="form-control" placeholder="Email address" type="text">
 					</div>
 					<div id="emailValid" class="form-group" style="display: none; color: red;">
 						Email is invalid or already taken
@@ -134,7 +61,7 @@ $(document).ready(function(){
 							<span class="input-group-text"> <i class="fa fa-lock"></i>
 							</span>
 						</div>
-						<input name="password2" id="password2" class="form-control" placeholder="Repeat password" type="password">
+						<input name="passwordConfirm" id="passwordConfirm" class="form-control" placeholder="Repeat password" type="password">
 					</div>
 					<div class="form-group">
 					<div id="passwordValid" class="form-group" style="display: none; color: red;">

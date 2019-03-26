@@ -1,11 +1,7 @@
 package com.cjhm.system.mail.service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.mail.internet.MimeUtility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

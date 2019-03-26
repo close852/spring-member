@@ -1,0 +1,23 @@
+label {
+	width: 100%;
+	float: left;
+	font-size: 12px;
+}
+
+label.error {
+	float: none;
+	color: red;
+	padding-left: 0px;
+	vertical-align: bottom;
+	color: red;
+}
+
+p {
+	clear: both;
+}
+
+em {
+	font-weight: bold;
+	padding-right: 1em;
+	vertical-align: top;
+}

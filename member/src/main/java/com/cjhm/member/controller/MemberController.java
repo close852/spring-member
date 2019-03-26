@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.thymeleaf.util.StringUtils;
 
 import com.cjhm.member.constants.MemberConstants;
 import com.cjhm.member.entity.User;
@@ -49,6 +48,14 @@ public class MemberController {
 			session.invalidate();
 		}
 		u = memberService.login(email, password);
+
+		// error 메시지 전달
+		if (u == null) {
+			model.addAttribute("error", "Incorrect email or password.");
+			model.addAttribute("email", email);
+			return "/member/login";
+		}
+		
 		//로그인 후 처리 로직
 		//내부,외부 여부
 		//사용자 정보 쿠키저장
@@ -60,28 +67,27 @@ public class MemberController {
 		
 		//로그인 후 처리 로직
 		session.setAttribute(MemberConstants.SESSION_USER, u);
-		// error 메시지 전달
-		if (u == null) {
-			model.addAttribute("error", "Incorrect email or password.");
-			model.addAttribute("email", email);
-			return "/member/login";
-		}
 		return "redirect:/";
 	}
 
 	@GetMapping("/join")
 	public String join() {
-		return "member/join";
+		return "/member/join";
 	}
 
 	@PostMapping("/join")
-	public String postJoin(@RequestParam("username") String name, @RequestParam("password") String password, @RequestParam("email") String email) {
+	public String postJoin(@RequestParam("username") String name, @RequestParam("password") String password, @RequestParam("email") String email,
+			Model model) {
 		
 		User u = new User();
 		u.setName(name);
 		u.setEmail(email);
 		u.setPassword(password);
-		
+		if(memberService.findUserByEmail(email)!=null) {
+			model.addAttribute("error", "There were problems creating your account.");
+			//에러페이지로 이동
+			return "/member/join";
+		};
 		logger.error("user data : " + u);
 		u = memberService.saveUser(u);
 		logger.error("user save data : " + u);
@@ -114,9 +120,5 @@ public class MemberController {
 	public String logout(HttpSession session) {
 		session.invalidate();
 		return "redirect:/";
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(UUID.randomUUID().toString().replaceAll("-", "").substring(16));
 	}
 }
