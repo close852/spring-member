@@ -7,7 +7,7 @@ $(document).ready(function() {
 		// });
 		// },
 		rules : {
-			email : {
+			username : {
 				required : true,
 				isBlankValue : true
 			},
