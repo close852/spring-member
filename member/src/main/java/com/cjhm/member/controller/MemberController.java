@@ -2,6 +2,7 @@ package com.cjhm.member.controller;
 
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -35,27 +36,36 @@ public class MemberController {
 	public String getLogin(HttpSession session) {
 		User u = (User) session.getAttribute(MemberConstants.SESSION_USER);
 		if (u != null) {
-			return "redirect:/";
+//			session.invalidate();
+//			return "redirect:/";
 		}
-		return "member/login";
+		return "/member/login";
 	}
 
 	@PostMapping("/login")
-	public String postLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model,
-			HttpSession session) {
-		User u = (User) session.getAttribute(MemberConstants.SESSION_USER);
-		if (u != null) {
-			session.invalidate();
-		}
-		u = memberService.login(email, password);
-
-		// error 메시지 전달
-		if (u == null) {
-			model.addAttribute("error", "Incorrect email or password.");
+	public String postLogin(@RequestParam("username") String email, @RequestParam("password") String password, Model model,
+			HttpSession session, HttpServletRequest request) {
+		//성공과 체크를 ... 확인할 방법이 없나.....???/
+		System.out.println("postLogin ... : " + request.getAttribute("status"));
+		User preU = (User) session.getAttribute(MemberConstants.SESSION_USER);
+		User u =null;
+		try {
+			u = memberService.login(email, password);
+			if (u == null || "FAIL".equals(request.getAttribute("status"))) {
+				throw new Exception("Incorrect email or password.");
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage()+" email = "+email+" user : "+u);
+			e.printStackTrace();
+			model.addAttribute("error", e.getMessage());
 			model.addAttribute("email", email);
 			return "/member/login";
 		}
+
 		
+		if (preU != null) {
+			session.invalidate();
+		}
 		//로그인 후 처리 로직
 		//내부,외부 여부
 		//사용자 정보 쿠키저장

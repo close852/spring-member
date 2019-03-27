@@ -28,14 +28,15 @@
 				<h4 class="card-title mt-3 text-center">
 					<a href="/">Sign In</a>
 				</h4>
-				<form id="loginForm" action="/member/login" method="post">
+<!-- 				<form id="loginForm" action="/member/login" method="post"> -->
+				<form id="loginForm" method="post">
 					<!-- form-group// -->
 					<div class="form-group input-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text"> <i class="fa fa-envelope"></i>
 							</span>
 						</div>
-						<input name="email" id="email" class="form-control" placeholder="Email address" type="text" th:value="${email}">
+						<input name="username" id="username" class="form-control" placeholder="Email address" type="text" th:value="${email}">
 					</div>
 					<!-- form-group// -->
 					<div class="form-group input-group">

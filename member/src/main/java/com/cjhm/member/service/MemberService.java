@@ -20,14 +20,9 @@ public class MemberService {
 
 	public User login(String email, String password) {
 
-		logger.info("login info : " + email + " : " + password);
 		User u = memberRepository.findByEmail(email);
 		logger.info("user info : " + u);
-		String encriptPassword = encript(password);
-		if (u != null && u.getPassword().equals(encriptPassword)) {
-			return u;
-		}
-		return null;
+		return u;
 	}
 
 	public User findUserByEmail(String email) {
@@ -43,13 +38,16 @@ public class MemberService {
 		return memberRepository.save(u);
 	}
 
-	private String encript(String password) {
-		return password;
-	}
-
 	public User saveUser(User u) {
 		
 		return memberRepository.save(u);
 	}
+
+//	public UserDetails loadUserByUsername(String email) {
+//		User user = memberRepository.findByEmail(email);
+//		GrantedAuthority authority;
+//		UserDetails users = new User();
+//		return new UserDetailsServiceImpl(new UserDetails(u));
+//	}
 
 }
