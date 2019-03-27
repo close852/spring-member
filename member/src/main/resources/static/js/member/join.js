@@ -67,6 +67,7 @@ $(document).ready(function() {
 
 	// 디바운싱으로 해결할 방법을 찾아야 한다.
 	$.validator.addMethod("isExistUser", function(value, element) {
+		console.log('asd..?')
 		var isc = false;
 		timer = null;
 		$.ajax({
@@ -77,6 +78,7 @@ $(document).ready(function() {
 				email : value
 			}
 		}).done(function(user) {
+			console.log(user+"/....")
 			if (user != '') {
 				isc = false;
 			} else {
