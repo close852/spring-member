@@ -133,6 +133,9 @@ public class User implements Serializable {
 	public void setCreateDate(LocalDateTime createDate) {
 		this.createDate = createDate;
 	}
+	public void setCreateDate() {
+		this.createDate = LocalDateTime.now();
+	}
 
 	public LocalDateTime getUpdateDate() {
 		return updateDate;
