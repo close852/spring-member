@@ -67,12 +67,10 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 							,"/css/**","/img/**","/js/**","/webjars/**"
 							,"/sample/**")
 				.permitAll()
-//				.antMatchers("/facebook").hasAnyAuthority(FACEBOOK.getRoleType())
-//				.antMatchers("/google").hasAnyAuthority(GOOGLE.getRoleType())
-//				.antMatchers("/kakao").hasAnyAuthority(KAKAO.getRoleType())
-//				.anyRequest().authenticated()
-//			.and()
-//				.antMatcher("/member/facebook/complete"). 
+				.antMatchers("/facebook").hasAnyAuthority(FACEBOOK.getRoleType())
+				.antMatchers("/google").hasAnyAuthority(GOOGLE.getRoleType())
+				.antMatchers("/kakao").hasAnyAuthority(KAKAO.getRoleType())
+				.anyRequest().authenticated()
 			.and()
 				//XFrameOptionsHeaderWriter의 최적설정 사용 안함.
 				.headers().frameOptions().disable()				
