@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -35,6 +36,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 	private MemberRepository memberRepository;
 
 	public UserArgumentResolver(MemberRepository memberRepository) {
+		System.out.println("resolver!");
 		this.memberRepository = memberRepository;
 	}
 
@@ -47,25 +49,34 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+		System.out.println("세션생성!");
 		HttpSession session = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest().getSession();
 		User user = (User) session.getAttribute(MemberConstants.SESSION_USER);
-		return getUser(user, session);
+		System.out.println(user);
+		return getUser(user, session); 
 	}
 
 	private User getUser(User user, HttpSession session) {
 		if (user == null) {
 			try {
-				OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-				Map<String, Object> map = (HashMap<String, Object>) authentication.getUserAuthentication().getDetails();
+				//ROLE_USER....
+				OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+				Map<String,Object> map = authentication.getPrincipal().getAttributes();
 				System.out.println("getUser Map info...START");
 				for(String o : map.keySet()) {
 					System.out.println(o+" : "+map.get(o));
 				}
 				System.out.println("getUser Map info...END");
-				User convertUser = convertUser(String.valueOf(authentication.getAuthorities().toArray()[0]), map);
+				System.out.println("authentication.getAuthorizedClientRegistrationId() ::"+authentication.getAuthorizedClientRegistrationId());
+				User convertUser = convertUser(authentication.getAuthorizedClientRegistrationId(), map);
+				System.out.println("convertUser :: "+convertUser);
 				user = memberRepository.findByEmail(convertUser.getEmail());
+				System.out.println("user :: "+user);
 				if (user == null) {
 					user = memberRepository.save(convertUser);
+				}
+				else {
+					user.setSocialType(convertUser.getSocialType());
 				}
 				setRoleIfNotSame(user, authentication, map);
 				session.setAttribute(MemberConstants.SESSION_USER, user);
@@ -77,11 +88,13 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 	}
 
 	private User convertUser(String authority, Map<String, Object> map) {
-		if (FACEBOOK.getRoleType().equals(authority)) {
+		System.out.println("authority ::"+ authority + " / "+FACEBOOK.getValue());
+		if (FACEBOOK.getValue().equals(authority)) {
+			System.out.println("facebook 들어오고...");
 			return getModernUser(FACEBOOK, map);
-		} else if (GOOGLE.getRoleType().equals(authority)) {
+		} else if (GOOGLE.getValue().equals(authority)) {
 			return getModernUser(GOOGLE, map);
-		} else if (KAKAO.getRoleType().equals(authority)) {
+		} else if (KAKAO.getValue().equals(authority)) {
 			return getKakaoUser(map);
 		}
 		return null;
@@ -99,6 +112,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 		return user;
 	}
 	private User getModernUser(SocialType socialType, Map<String, Object> map) {
+		System.out.println(socialType);
 		User user = new User();
 		user.setName(String.valueOf(map.get("name")));
 		user.setEmail(String.valueOf(map.get("email")));
@@ -108,7 +122,8 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 		return user;
 	}
 	
-	private void setRoleIfNotSame(User user, OAuth2Authentication authentication,Map<String, Object> map) {
+	private void setRoleIfNotSame(User user, OAuth2AuthenticationToken authentication,Map<String, Object> map) {
+		System.out.println("setRoleIfNotSame ! "+ authentication.getAuthorities());
 		if(!authentication.getAuthorities().contains(new SimpleGrantedAuthority(user.getSocialType().getRoleType()))) {
 			SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(map,"N/A",
 					AuthorityUtils.createAuthorityList(user.getSocialType().getRoleType())));

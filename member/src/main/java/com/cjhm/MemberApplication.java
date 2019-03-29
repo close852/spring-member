@@ -27,7 +27,7 @@ public class MemberApplication implements WebMvcConfigurer{
 	private UserArgumentResolver userArgumentResolver;
 	
 	@GetMapping("/")
-	public String index(Model m, HttpSession session) {
+	public String index(Model m, HttpSession session) { 
 //		User u = (User) session.getAttribute(MemberConstants.SESSION_USER);
 //		if(u!=null) {
 //			return "/index";
