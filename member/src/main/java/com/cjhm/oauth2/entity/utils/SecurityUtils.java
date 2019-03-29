@@ -14,6 +14,7 @@ public class SecurityUtils {
 
 	private static Collection<? extends GrantedAuthority> authorities(com.cjhm.member.entity.User u) {
 		List<GrantedAuthority> authorities = new ArrayList<>();
+		System.err.println("authorities");
 		if (!StringUtils.isEmpty(u.getSocialType())) {
 			authorities.add(new SimpleGrantedAuthority(u.getSocialType().getRoleType()));
 		} else {

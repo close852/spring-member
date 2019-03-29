@@ -133,6 +133,9 @@ public class User implements Serializable {
 	public void setCreateDate(LocalDateTime createDate) {
 		this.createDate = createDate;
 	}
+	public void setCreateDate() {
+		this.createDate = LocalDateTime.now();
+	}
 
 	public LocalDateTime getUpdateDate() {
 		return updateDate;
@@ -197,7 +200,7 @@ public class User implements Serializable {
 	@Override
 	public String toString() {
 		return "User [idx=" + idx + ", name=" + name + ", email=" + email + ", createDate="
-				+ createDate + ", updateDate=" + updateDate + "]";
+				+ createDate + ", updateDate=" + updateDate + "]"+socialType;
 	}
 
 }
