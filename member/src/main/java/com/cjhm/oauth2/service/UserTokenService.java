@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.Authoriti
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.stereotype.Service;
 
 import com.cjhm.member.enums.SocialType;
 import com.cjhm.oauth2.ClientResources;
@@ -18,8 +19,8 @@ import com.cjhm.oauth2.ClientResources;
  */
 public class UserTokenService extends UserInfoTokenServices {
 	public UserTokenService(ClientResources resources, SocialType socialType) {
-		super(resources.getResource().getTokenInfoUri(), resources.getClient().getClientId());
-		Map<String, String> map = new HashMap<>();
+		super(resources.getResource().getUserInfoUri(), resources.getClient().getClientId());
+		System.out.println("UserTokenService");
 		setAuthoritiesExtractor(new OAuth2AuthoritiesExtractor(socialType));
 	}
 
@@ -28,13 +29,12 @@ public class UserTokenService extends UserInfoTokenServices {
 		private String socialType;
 
 		public OAuth2AuthoritiesExtractor(SocialType socialType) {
-			System.out.println("OAuth2AuthoritiesExtractor 생성자");
 			this.socialType = socialType.getRoleType();
 		}
 
 		@Override
 		public List<GrantedAuthority> extractAuthorities(Map<String, Object> map) {
-			System.out.println("extractAuthorities 메소드 호출");
+			System.out.println("extractAuthorities 메소드 호출 : "+this.socialType);
 			return AuthorityUtils.createAuthorityList(this.socialType);
 		}
 

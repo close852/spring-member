@@ -40,7 +40,6 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
-		System.err.println("supportsParameter");
 		return parameter.getParameterAnnotation(SocialUser.class) != null
 				&& parameter.getParameterType().equals(User.class);
 	}
@@ -48,19 +47,15 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-		System.out.println("resolveArgument");
-		HttpSession session = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-				.getRequest().getSession();
+		HttpSession session = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest().getSession();
 		User user = (User) session.getAttribute(MemberConstants.SESSION_USER);
 		return getUser(user, session);
 	}
 
 	private User getUser(User user, HttpSession session) {
-		System.out.println("getUser :: "+user);
-		if (user != null) {
+		if (user == null) {
 			try {
-				OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext()
-						.getAuthentication();
+				OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
 				Map<String, Object> map = (HashMap<String, Object>) authentication.getUserAuthentication().getDetails();
 				System.out.println("getUser Map info...START");
 				for(String o : map.keySet()) {
@@ -77,16 +72,16 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 			} catch (ClassCastException e) {
 				return user;
 			}
-		}
+		} 
 		return user;
 	}
 
 	private User convertUser(String authority, Map<String, Object> map) {
-		if (FACEBOOK.getValue().equals(authority)) {
+		if (FACEBOOK.getRoleType().equals(authority)) {
 			return getModernUser(FACEBOOK, map);
-		} else if (GOOGLE.getValue().equals(authority)) {
+		} else if (GOOGLE.getRoleType().equals(authority)) {
 			return getModernUser(GOOGLE, map);
-		} else if (KAKAO.getValue().equals(authority)) {
+		} else if (KAKAO.getRoleType().equals(authority)) {
 			return getKakaoUser(map);
 		}
 		return null;
