@@ -25,6 +25,7 @@ public class MemberApplication implements WebMvcConfigurer{
 
 	@Autowired
 	private UserArgumentResolver userArgumentResolver;
+	
 	@GetMapping("/")
 	public String index(Model m, HttpSession session) {
 //		User u = (User) session.getAttribute(MemberConstants.SESSION_USER);
@@ -40,7 +41,6 @@ public class MemberApplication implements WebMvcConfigurer{
 	}
 	
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-		System.out.println("addArgumentResolvers!!!");
 		argumentResolvers.add(userArgumentResolver);
 	}
 
