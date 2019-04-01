@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,19 +28,23 @@ import com.cjhm.system.mail.service.EmailSender;
 @RequestMapping("/member")
 public class MemberController {
 
+	Logger logger = LoggerFactory.getLogger(MemberController.class);
+	
 	@Autowired
 	MemberService memberService;
-
+ 
 	@Autowired
 	EmailSender emailSender;
 
+	@Autowired
+	PasswordEncoder passwordEncoder;
+	
 	@Value("${custom.oauth2.naver.client-id}")
 	private String naverClientId;
 	
 	@Value("${custom.oauth2.naver.client-secret}")
 	private String naverClientSecret;
 	private String redirectUri="http://127.0.0.1:8080/oauth2/naver/complete"; 
-	Logger logger = LoggerFactory.getLogger(MemberController.class);
 
 	@GetMapping("/login")
 	public String getLogin(Model model,HttpSession session) {
@@ -48,6 +53,8 @@ public class MemberController {
 		apiURL+="&client_secret="+naverClientSecret;
 		apiURL+="&redirect_uri="+redirectUri;
 
+		logger.debug("naverLogin Call URL : "+apiURL);
+		
 		SecureRandom random = new SecureRandom();
 	    String state = new BigInteger(130, random).toString();
 		apiURL+="&state="+state;
@@ -59,8 +66,6 @@ public class MemberController {
 	@PostMapping("/login")
 	public String postLogin(@RequestParam("username") String email, @RequestParam("password") String password,
 			Model model, HttpSession session, HttpServletRequest request) {
-		// 성공과 체크를 ... 확인할 방법이 없나.....???/
-//		System.out.println("postLogin ... : " + request.getAttribute("status"));
 		User preU = (User) session.getAttribute(MemberConstants.SESSION_USER);
 		User u = null;
 		try {
@@ -69,7 +74,7 @@ public class MemberController {
 				throw new Exception("Incorrect email or password.");
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage() + " email = " + email + " user : " + u);
+			logger.error("login fail/ status="+request.getAttribute("status")+" > "+e.getMessage() + " email = " + email + " user : " + u);
 			e.printStackTrace();
 			model.addAttribute("error", e.getMessage());
 			model.addAttribute("email", email);
@@ -77,6 +82,7 @@ public class MemberController {
 		}
 
 		if (preU != null) {
+			logger.debug("이미 계정 존재.."+preU);
 			session.setAttribute(MemberConstants.SESSION_USER, null);
 			session.invalidate();
 		}
@@ -106,7 +112,7 @@ public class MemberController {
 		User u = new User();
 		u.setName(name);
 		u.setEmail(email);
-		u.setPassword(password);
+		u.setPassword(passwordEncoder.encode(password));
 		if (memberService.findAuthUserByEmail(email,null) != null) {
 			model.addAttribute("error", "There were problems creating your account.");
 			// 에러페이지로 이동

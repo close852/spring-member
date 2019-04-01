@@ -7,18 +7,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +37,8 @@ import net.minidev.json.parser.ParseException;
 @Controller
 public class LoginController {
 
+	Logger logger = LoggerFactory.getLogger(LoginController.class);
+
 	@Autowired
 	private MemberService memberService;
 	/**
@@ -54,20 +56,29 @@ public class LoginController {
 	@GetMapping("/loginSuccess/kakao")
 	public String kakaoLogin(HttpServletRequest request,@Value("${custom.oauth2.kakao.client-id}") String clientId
 			,HttpSession session) throws UnsupportedEncodingException {
-		//네이버 상태 체크
 		String code = request.getParameter("code");
 		String state= request.getParameter("state");
-		System.out.println(code +"/"+state);
 		String tokenUri="https://kauth.kakao.com/oauth/token";
-		
 		String redirectURI=baseUrl+"/loginSuccess/kakao";
-		JSONObject token = authLogin(tokenUri,code,state,clientId,"x",redirectURI);
+		JSONObject token = null;
+		try {
+			logger.debug("code="+code+", state="+state);
+			token = authLogin(tokenUri,code,state,clientId,"x",redirectURI);
+		} catch (IOException e) {
+			e.printStackTrace();
+			request.setAttribute("error", e.getMessage());
+			return "/member/login";
+		}
 		String accessToken = null;
-		String refreshToken;
+//		String refreshToken;
 		if(token!=null) {
 			accessToken = (String)token.get("access_token");
-			refreshToken = (String)token.get("refresh_token");
+//			refreshToken = (String)token.get("refresh_token");
+		}else {
+			request.setAttribute("error", "접속 오류");
+			return "/member/login";
 		}
+
 		String apiURI="https://kapi.kakao.com/v1/user/me";
 
 		JSONObject dataInfo = getAuthProfile(apiURI,accessToken);
@@ -89,19 +100,23 @@ public class LoginController {
 	@GetMapping("/loginSuccess/naver")
 	public String naverLogin(HttpServletRequest request, @Value("${custom.oauth2.naver.client-id}") String clientId,
 			@Value("${custom.oauth2.naver.client-secret}") String clientSecret
-			,HttpSession session) throws UnsupportedEncodingException {
+			,HttpSession session) throws IOException {
 		// 네이버 상태 체크
 		String code = request.getParameter("code");
 		String state = request.getParameter("state");
 		String tokenUri = "https://nid.naver.com/oauth2.0/token";
 		String redirectURI = baseUrl+"/loginSuccess/naver";
-		JSONObject token = authLogin(tokenUri, code, state, clientId, clientSecret, redirectURI);
+		JSONObject token = null;
+			token = authLogin(tokenUri, code, state, clientId, clientSecret, redirectURI);
 		String accessToken = null;
 		String apiURI = "https://openapi.naver.com/v1/nid/me";
-		String refreshToken;
+//		String refreshToken;
 		if (token != null) {
 			accessToken = (String) token.get("access_token");
-			refreshToken = (String) token.get("refresh_token");
+//			refreshToken = (String) token.get("refresh_token");
+		}else {
+			request.setAttribute("error", "접속 오류");
+			return "/member/login";
 		}
 
 		JSONObject dataInfo = getAuthProfile(apiURI, accessToken);
@@ -138,7 +153,7 @@ public class LoginController {
 //				System.out.println(o+" : "+map.get(o));
 //			}
 
-//			setRoleIfNotSame(user,map);
+			setRoleIfNotSame(user,null);
 			session.setAttribute(MemberConstants.SESSION_USER, saveUser);
 			System.out.println(saveUser);
 			return saveUser;
@@ -173,7 +188,7 @@ public class LoginController {
                 response.append(inputLine);
             }
 			br.close();
-            System.out.println(response.toString());
+			logger.debug("callback getAuthProfile data : "+responseCode+" - "+response.toString());
             
   	      if(responseCode==200) {
 	    	  JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
@@ -182,6 +197,7 @@ public class LoginController {
 	      }
   	      
         } catch (Exception e) {
+        	System.out.println("여긴가..???");
             System.out.println(e);
         }
         
@@ -198,14 +214,14 @@ public class LoginController {
 		apiURL += "&redirect_uri=" + redirectURI;
 		apiURL += "&code=" + code;
 		apiURL += "&state=" + state;
-		System.out.println("apiURL=" + apiURL);
+		logger.debug("apiURL= " + apiURL);
 		try {
 			BufferedReader br;
 			URL url = new URL(apiURL);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			int responseCode = con.getResponseCode();
-			System.out.println("responseCode=" + responseCode);
+			logger.debug("responseCode=" + responseCode);
 			if (responseCode == 200) { // 정상 호출
 				br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			} else { // 에러 발생
@@ -217,15 +233,15 @@ public class LoginController {
 				res.append(inputLine);
 			}
 			br.close();
-			System.out.println(res.toString());
+			logger.debug("callback authLogin data : "+responseCode+" - "+res.toString());
 			if (responseCode == 200) {
 				JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
 				JSONObject json = (JSONObject) parser.parse(res.toString());
 				return json;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			// TODO Auto-generated catch block
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -257,103 +273,6 @@ public class LoginController {
 	@ResponseBody
 	public String google() {
 		return "google";
-	}
-	
-	@GetMapping("/oauth2/naver/complete")
-	@ResponseBody
-	public String naverOAuth2Complete(@Value("${custom.oauth2.naver.client-id}") String clientId,@Value("${custom.oauth2.naver.client-secret}") String clientSecret,HttpServletRequest request,HttpSession session) throws IOException {
-	    String code = request.getParameter("code");
-	    String state = request.getParameter("state");
-	    
-	    Map<String, String[]> maps = request.getParameterMap();
-	    for(String str : maps.keySet()) {
-	    	System.out.println(str + " :: "+Arrays.deepToString(maps.get(str)));
-	    }
-
-	    
-	    String redirectURI = URLEncoder.encode("http://127.0.0.1:8080/oauth2/naver/complete", "UTF-8");
-	    String apiURL;
-
-	    apiURL = "https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&";
-	    apiURL += "client_id=" + clientId;
-	    apiURL += "&client_secret=" + clientSecret;
-	    apiURL += "&redirect_uri=" + redirectURI;
-	    apiURL += "&code=" + code;
-	    apiURL += "&state=" + state;
-	    String access_token = "";
-	    String refresh_token = "";
-	    System.out.println("apiURL="+apiURL);
-	    try {
-	      URL url = new URL(apiURL);
-	      HttpURLConnection con = (HttpURLConnection)url.openConnection();
-	      con.setRequestMethod("GET");
-	      int responseCode = con.getResponseCode();
-	      BufferedReader br;
-	      System.out.print("responseCode="+responseCode);
-	      if(responseCode==200) { // 정상 호출
-	        br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-	      } else {  // 에러 발생
-	        br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-	      }
-	      String inputLine;
-	      StringBuffer res = new StringBuffer();
-	      while ((inputLine = br.readLine()) != null) {
-	        res.append(inputLine);
-	      }
-	      br.close();
-	      System.out.println(res.toString());
-	      if(responseCode==200) {
-	    	  JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
-	    	  JSONObject json=(JSONObject)parser.parse(res.toString());
-	    	 System.out.println(json);
-	    	  access_token = json.get("access_token").toString();
-	    	  refresh_token = json.get("refresh_token").toString();
-	    	  System.out.println(access_token+"/"+refresh_token);
-	      }
-
-	      
-	        String token = access_token;// 네이버 로그인 접근 토큰;
-	        String header = "Bearer " + token; // Bearer 다음에 공백 추가
-	        try {
-	            String apiURL2 = "https://openapi.naver.com/v1/nid/me";
-	            URL url2 = new URL(apiURL2);
-	            HttpURLConnection con2 = (HttpURLConnection)url2.openConnection();
-	            con2.setRequestMethod("GET");
-	            con2.setRequestProperty("Authorization", header);
-	            int responseCode2 = con2.getResponseCode();
-	  	      BufferedReader br2;
-	            if(responseCode2==200) { // 정상 호출
-	            	br2 = new BufferedReader(new InputStreamReader(con2.getInputStream()));
-	            } else {  // 에러 발생
-	            	br2 = new BufferedReader(new InputStreamReader(con2.getErrorStream()));
-	            }
-	            StringBuffer response = new StringBuffer();
-	            while ((inputLine = br2.readLine()) != null) {
-	                response.append(inputLine);
-	            }
-	            br2.close();
-	            System.out.println(response.toString());
-	            
-	  	      if(responseCode==200) {
-		    	  JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
-		    	  JSONObject json=(JSONObject)parser.parse(response.toString());
-		    	  JSONObject respJson = (JSONObject) json.get("response");
-		    	  String id = respJson.get("id").toString();
-		    	  String nickname = respJson.get("nickname").toString();
-		    	  String email = respJson.get("email").toString();
-		    	  String name = respJson.get("name").toString();
-		    	  System.out.println(id+"/"+nickname+"/"+email +"/"+name);
-		      }
-	  	      
-	        } catch (Exception e) {
-	            System.out.println(e);
-	        }
-
-	    } catch (Exception e) {
-	      System.out.println(e);
-	    }
-
-	    return "/member/loginSuccess";
 	}
 	
 }

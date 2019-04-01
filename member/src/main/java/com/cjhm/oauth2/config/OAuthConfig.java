@@ -3,6 +3,7 @@ package com.cjhm.oauth2.config;
 import static com.cjhm.member.enums.SocialType.FACEBOOK;
 import static com.cjhm.member.enums.SocialType.GOOGLE;
 import static com.cjhm.member.enums.SocialType.KAKAO;
+import static com.cjhm.member.enums.SocialType.NAVER;
 
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.servlet.RequestDispatcher;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
@@ -34,6 +37,9 @@ import com.cjhm.oauth2.enums.CustomOAuth2Provider;
 @EnableWebSecurity
 public class OAuthConfig extends WebSecurityConfigurerAdapter{
 
+	
+	Logger logger = LoggerFactory.getLogger(OAuthConfig.class);
+
 	//Spring Security로 userDetails 작성하여 인증하기 위해서 필수
 	//... auth 처리 방법 알아내기
 	@Autowired
@@ -43,8 +49,6 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	ShaPasswordEncoder passwordEncoder;
 	
-	
-	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		CharacterEncodingFilter filter = new CharacterEncodingFilter("UTF-8");
@@ -52,16 +56,14 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 				.antMatchers("/"
 							,"/apis/**"
 							,"/member/login","/member/join","/member/logout","/member/password_reset"
-//							,"/loginSuccess"
-//							,"/login/member/**"
-//							,"/loginSuccess/**"
-//							,"/oauth2/**"
+							,"/loginSuccess/**"
 							,"/css/**","/img/**","/js/**","/webjars/**"
 							,"/sample/**")
 				.permitAll()
 				.antMatchers("/facebook").hasAnyAuthority(FACEBOOK.getRoleType())
-				.antMatchers("/google").hasAnyAuthority(GOOGLE	.getRoleType())
+				.antMatchers("/google").hasAnyAuthority(GOOGLE.getRoleType())
 				.antMatchers("/kakao").hasAnyAuthority(KAKAO.getRoleType())
+				.antMatchers("/naver").hasAnyAuthority(NAVER.getRoleType())
 				.anyRequest().authenticated()
 			.and()
 				//XFrameOptionsHeaderWriter의 최적설정 사용 안함.
@@ -113,8 +115,6 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 			@Value("${custom.oauth2.naver.client-id}") String naverClientId,
 			@Value("${custom.oauth2.naver.client-secret}") String naverClientSeret){
 		
-		System.out.println("clientRegistrationRepository : " + kakaoClientId);
-		System.out.println(propoerties);
 		List<ClientRegistration> registrations  = propoerties.getRegistration().keySet().stream()
 						.map(client ->  getRegistration(propoerties,client))
 						.filter(Objects::nonNull)
@@ -128,15 +128,10 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 				.clientSecret("x")
 				.jwkSetUri("x").build());
 		
-		System.out.println("registrations.size() : "+ registrations.size());
-		for(ClientRegistration c : registrations) {
-			System.out.println(c.getClientName());
-		}
 		return new InMemoryClientRegistrationRepository(registrations);
 	}
 	private ClientRegistration getRegistration(OAuth2ClientProperties properties, String client) {
 		
-		System.out.println("client!"+client);
 		if("google".equals(client)) {
 			OAuth2ClientProperties.Registration registration = properties.getRegistration().get("google");
 			return CommonOAuth2Provider.GOOGLE.getBuilder(client)

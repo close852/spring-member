@@ -52,7 +52,5 @@ public enum CustomOAuth2Provider {
 		}	
 	};
 	
-	private static final String DEFAULT_LOGIN_REDIRECT_URL="{baseUrl}/loginSuccess";
-
 	public abstract ClientRegistration.Builder getBuilder(String registrationId);
 }

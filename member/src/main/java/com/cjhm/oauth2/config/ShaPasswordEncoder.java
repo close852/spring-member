@@ -21,7 +21,7 @@ public class ShaPasswordEncoder implements PasswordEncoder {
 				hexString.append(hex);
 			}
 //			 출력C
-			System.out.println(hexString.toString());
+//			System.out.println(hexString.toString());
 		} catch (
 
 		Exception ex) {
@@ -33,9 +33,9 @@ public class ShaPasswordEncoder implements PasswordEncoder {
 
 	@Override
 	public boolean matches(CharSequence rawPassword, String encodedPassword) {
-		System.out.println("matches : " + rawPassword + "/" + encodedPassword);
-//		return encode(rawPassword).equals(encodedPassword);
-		return (rawPassword).equals(encodedPassword);
+//		System.out.println("matches : " + rawPassword + "/" + encodedPassword);
+		return encode(rawPassword).equals(encodedPassword);
+//		return (rawPassword).equals(encodedPassword);
 	}
 
 }
