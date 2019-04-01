@@ -43,6 +43,8 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	ShaPasswordEncoder passwordEncoder;
 	
+	
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		CharacterEncodingFilter filter = new CharacterEncodingFilter("UTF-8");
@@ -50,7 +52,10 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 				.antMatchers("/"
 							,"/apis/**"
 							,"/member/login","/member/join","/member/logout","/member/password_reset"
-							,"/loginSuccess"
+//							,"/loginSuccess"
+//							,"/login/member/**"
+//							,"/loginSuccess/**"
+//							,"/oauth2/**"
 							,"/css/**","/img/**","/js/**","/webjars/**"
 							,"/sample/**")
 				.permitAll()
@@ -103,9 +108,11 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 	}
 
 	@Bean
-	public ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties propoerties , @Value("${custom.oauth2.kakao.client-id}") String kakaoClientId , @Value("${custom.oauth2.naver.client-id}") String naverClientId){
-//		List<ClientRegistration> registrations = propoerties.getRegistration().keySet().stream()
-//					.map(client ->  getRegistration(propoerties,client)).filter(Objects::nonNull).collect(Collectors.toList()) ;
+	public ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties propoerties, 
+			@Value("${custom.oauth2.kakao.client-id}") String kakaoClientId,
+			@Value("${custom.oauth2.naver.client-id}") String naverClientId,
+			@Value("${custom.oauth2.naver.client-secret}") String naverClientSeret){
+		
 		System.out.println("clientRegistrationRepository : " + kakaoClientId);
 		System.out.println(propoerties);
 		List<ClientRegistration> registrations  = propoerties.getRegistration().keySet().stream()

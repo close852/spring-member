@@ -11,8 +11,8 @@ public enum CustomOAuth2Provider {
 		@Override
 		public ClientRegistration.Builder getBuilder(String registrationId) {
 			System.out.println("ㅕ기...?");
-			ClientRegistration.Builder builder = getBuilder(registrationId,ClientAuthenticationMethod.POST,DEFAULT_LOGIN_REDIRECT_URL);
-			builder.scope("profile");
+			ClientRegistration.Builder builder = getBuilder(registrationId,ClientAuthenticationMethod.POST,"{baseUrl}/loginSuccess/kakao");
+			builder.scope("profile","account_email");
 			builder.authorizationUri("https://kauth.kakao.com/oauth/authorize");
 			builder.tokenUri("https://kauth.kakao.com/oauth/token");
 			builder.userInfoUri("https://kapi.kakao.com/v1/user/me");
@@ -20,7 +20,6 @@ public enum CustomOAuth2Provider {
 			builder.clientName("kakao");
 			return builder;
 		}
-
 		private Builder getBuilder(String registrationId, ClientAuthenticationMethod method, String redirectUri) {
 			ClientRegistration.Builder builder = ClientRegistration.withRegistrationId(registrationId);
 			builder.clientAuthenticationMethod(method);
@@ -33,11 +32,12 @@ public enum CustomOAuth2Provider {
 		@Override
 		public ClientRegistration.Builder getBuilder(String registrationId) {
 			System.out.println("ㅕ기...?");
-			ClientRegistration.Builder builder = getBuilder(registrationId,ClientAuthenticationMethod.POST,DEFAULT_LOGIN_REDIRECT_URL);
-			builder.scope("bearer");
+//			ClientRegistration.Builder builder = getBuilder(registrationId,ClientAuthenticationMethod.BASIC,"http://127.0.0.1:8080/oauth2/naver/complete");
+			ClientRegistration.Builder builder = getBuilder(registrationId,ClientAuthenticationMethod.BASIC,"{baseUrl}/loginSuccess/naver");
+			builder.scope("profile");
 			builder.authorizationUri("https://nid.naver.com/oauth2.0/authorize");
 			builder.tokenUri("https://nid.naver.com/oauth2.0/token");
-			builder.userInfoUri("https://openapi.naver.com/v1/nid/me");
+			builder.userInfoUri("https://kapi.kakao.com/v1/user/me");
 			builder.userNameAttributeName("id");
 			builder.clientName("naver");
 			return builder;

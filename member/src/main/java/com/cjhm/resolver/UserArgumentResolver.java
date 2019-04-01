@@ -2,9 +2,7 @@ package com.cjhm.resolver;
 
 import static com.cjhm.member.enums.SocialType.FACEBOOK;
 import static com.cjhm.member.enums.SocialType.GOOGLE;
-import static com.cjhm.member.enums.SocialType.KAKAO;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -17,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -79,7 +78,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 				System.out.println("authentication.getAuthorizedClientRegistrationId() ::"+authentication.getAuthorizedClientRegistrationId());
 				User convertUser = convertUser(authentication.getAuthorizedClientRegistrationId(), map);
 				System.out.println("convertUser :: "+convertUser);
-				user = memberRepository.findByEmail(convertUser.getEmail());
+				user = memberRepository.findByEmailAndPrincipal(convertUser.getEmail(),convertUser.getPrincipal());
 				System.out.println("user :: "+user);
 				if (user == null) {
 					user = memberRepository.save(convertUser);
@@ -90,7 +89,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 				setRoleIfNotSame(user, authentication, map);
 				session.setAttribute(MemberConstants.SESSION_USER, user);
 			} catch (ClassCastException e) {
-				System.out.println("왜 에러??"+e);
+				System.out.println("여기임..."+e.getMessage());
 				return user;
 			}
 		} 
@@ -98,35 +97,20 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 	}
 
 	private User convertUser(String authority, Map<String, Object> map) {
-		System.out.println("authority ::"+ authority + " / "+FACEBOOK.getValue());
 		if (FACEBOOK.getValue().equals(authority)) {
-			System.out.println("facebook 들어오고...");
 			return getModernUser(FACEBOOK, map);
 		} else if (GOOGLE.getValue().equals(authority)) {
 			return getModernUser(GOOGLE, map);
-		} else if (KAKAO.getValue().equals(authority)) {
-			return getKakaoUser(map);
 		}
 		return null;
 	}
 
-	private User getKakaoUser(Map<String, Object> map) {
-		HashMap<String, Object> propertiesMap = (HashMap<String, Object>)(Object)map.get("properties");
-		User user = new User();
-		user.setName(String.valueOf(propertiesMap.get("name")));
-		user.setEmail(String.valueOf(propertiesMap.get("email")));
-		user.setPrincipal(String.valueOf(propertiesMap.get("id")));
-		user.setSocialType(KAKAO);
-		user.setCreateDate();
-
-		return user;
-	}
 	private User getModernUser(SocialType socialType, Map<String, Object> map) {
-		System.out.println(socialType);
+		System.out.println("getModernUser ::"+socialType +"    ->"+map.get("sub"));
 		User user = new User();
 		user.setName(String.valueOf(map.get("name")));
 		user.setEmail(String.valueOf(map.get("email")));
-		user.setPrincipal(String.valueOf(map.get("id")));
+		user.setPrincipal(map.get("id")==null?String.valueOf(map.get("sub")):String.valueOf(map.get("id")));
 		user.setSocialType(socialType);
 		user.setCreateDate();
 		return user;

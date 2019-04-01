@@ -24,7 +24,7 @@ public class MemberRestController {
 	@PostMapping("/findUserByIdAjax")
 	public String findUserByIdAjax(@RequestParam("email") String email) {
 		logger.error("findUserByIdAjax : " + email);
-		User u = memberService.findUserByEmail(email);
+		User u = memberService.findAuthUserByEmail(email,null);
 		Gson gson = new Gson();
 		String json = gson.toJson(u);
 		logger.error(json);
