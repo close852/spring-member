@@ -11,11 +11,11 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -42,6 +42,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		System.out.println("여기옴??");
 		return parameter.getParameterAnnotation(SocialUser.class) != null
 				&& parameter.getParameterType().equals(User.class);
 	}
@@ -57,9 +58,17 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 	}
 
 	private User getUser(User user, HttpSession session) {
+		System.out.println("사용자 생성....");
 		if (user == null) {
+			System.out.println("사용자 생성....2");
 			try {
+				System.out.println("여기까지 안와??");
 				//ROLE_USER....
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				System.out.println(auth.getName());
+				System.out.println(auth.getCredentials());
+				System.out.println(auth.getPrincipal());
+				System.out.println(auth.getAuthorities());
 				OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 				Map<String,Object> map = authentication.getPrincipal().getAttributes();
 				System.out.println("getUser Map info...START");
@@ -81,6 +90,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 				setRoleIfNotSame(user, authentication, map);
 				session.setAttribute(MemberConstants.SESSION_USER, user);
 			} catch (ClassCastException e) {
+				System.out.println("왜 에러??"+e);
 				return user;
 			}
 		} 

@@ -50,7 +50,7 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 				.antMatchers("/"
 							,"/apis/**"
 							,"/member/login","/member/join","/member/logout","/member/password_reset"
-//							,"/login/member/**"
+							,"/loginSuccess"
 							,"/css/**","/img/**","/js/**","/webjars/**"
 							,"/sample/**")
 				.permitAll()
@@ -103,7 +103,7 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 	}
 
 	@Bean
-	public ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties propoerties , @Value("${custom.oauth2.kakao.client-id}") String kakaoClientId){
+	public ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties propoerties , @Value("${custom.oauth2.kakao.client-id}") String kakaoClientId , @Value("${custom.oauth2.naver.client-id}") String naverClientId){
 //		List<ClientRegistration> registrations = propoerties.getRegistration().keySet().stream()
 //					.map(client ->  getRegistration(propoerties,client)).filter(Objects::nonNull).collect(Collectors.toList()) ;
 		System.out.println("clientRegistrationRepository : " + kakaoClientId);
@@ -116,10 +116,20 @@ public class OAuthConfig extends WebSecurityConfigurerAdapter{
 						.clientId(kakaoClientId)
 						.clientSecret("x")
 						.jwkSetUri("x").build());
+		registrations.add(CustomOAuth2Provider.NAVER.getBuilder("naver")
+				.clientId(naverClientId)
+				.clientSecret("x")
+				.jwkSetUri("x").build());
+		
+		System.out.println("registrations.size() : "+ registrations.size());
+		for(ClientRegistration c : registrations) {
+			System.out.println(c.getClientName());
+		}
 		return new InMemoryClientRegistrationRepository(registrations);
 	}
 	private ClientRegistration getRegistration(OAuth2ClientProperties properties, String client) {
 		
+		System.out.println("client!"+client);
 		if("google".equals(client)) {
 			OAuth2ClientProperties.Registration registration = properties.getRegistration().get("google");
 			return CommonOAuth2Provider.GOOGLE.getBuilder(client)
