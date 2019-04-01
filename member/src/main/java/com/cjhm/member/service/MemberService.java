@@ -33,6 +33,14 @@ public class MemberService {
 		return u;
 
 	}
+	public User findAuthUserByEmail(String email,String principal) {
+		logger.info("login info : " + email);
+		User u = memberRepository.findByEmailAndPrincipal(email,principal);
+		logger.info("user info : " + u);
+		
+		return u;
+		
+	}
 	
 	public User updateUserByEmail(User u) {
 		return memberRepository.save(u);

@@ -1,5 +1,7 @@
 package com.cjhm.member.controller;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,10 +33,26 @@ public class MemberController {
 	@Autowired
 	EmailSender emailSender;
 
+	@Value("${custom.oauth2.naver.client-id}")
+	private String naverClientId;
+	
+	@Value("${custom.oauth2.naver.client-secret}")
+	private String naverClientSecret;
+	private String redirectUri="http://127.0.0.1:8080/oauth2/naver/complete"; 
 	Logger logger = LoggerFactory.getLogger(MemberController.class);
 
 	@GetMapping("/login")
-	public String getLogin() {
+	public String getLogin(Model model,HttpSession session) {
+		String apiURL="https://nid.naver.com/oauth2.0/authorize?response_type=code";
+		apiURL+="&client_id="+naverClientId;
+		apiURL+="&client_secret="+naverClientSecret;
+		apiURL+="&redirect_uri="+redirectUri;
+
+		SecureRandom random = new SecureRandom();
+	    String state = new BigInteger(130, random).toString();
+		apiURL+="&state="+state;
+		session.setAttribute("state", state);
+		model.addAttribute("apiURL", apiURL);
 		return "/member/login";
 	}
 
@@ -88,7 +107,7 @@ public class MemberController {
 		u.setName(name);
 		u.setEmail(email);
 		u.setPassword(password);
-		if (memberService.findUserByEmail(email) != null) {
+		if (memberService.findAuthUserByEmail(email,null) != null) {
 			model.addAttribute("error", "There were problems creating your account.");
 			// 에러페이지로 이동
 			return "/member/join";
